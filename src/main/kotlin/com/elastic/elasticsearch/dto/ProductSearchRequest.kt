@@ -6,5 +6,6 @@ data class ProductSearchRequest(
     val quantity: Int? = null,
     val categories: List<String> = listOf(),
     val description: String? = null,
-    val manufacturer: String? = null
+    val manufacturer: String? = null,
+    val name: String? = null
 )

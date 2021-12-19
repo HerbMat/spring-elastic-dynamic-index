@@ -10,7 +10,7 @@ data class Product(
     @Id
     var id: String? = null,
 
-    @Field(type = FieldType.Text, name = "name")
+    @Field(type = FieldType.Text, name = "name", fielddata = true)
     var name: String? = null,
 
     @Field(type = FieldType.Double, name = "price")

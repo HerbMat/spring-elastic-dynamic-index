@@ -1,0 +1,24 @@
+{
+  "properties": [
+    {
+      "name": "elastic.index.create",
+      "type": "java.lang.Boolean",
+      "description": "Enable auto indexing on save.",
+      "defaultValue": "false"
+    }
+  ],
+  "hints": [
+    {
+      "name": "elastic.index.create",
+      "values": [
+        {
+          "value": "false",
+          "description": "Creating index on save is disabled."
+        },
+        {
+          "value": "true",
+          "description": "Creating index on save is enabled."
+        }
+      ]
+  }
+]}

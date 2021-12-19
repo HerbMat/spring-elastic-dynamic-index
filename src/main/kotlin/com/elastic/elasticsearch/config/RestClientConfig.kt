@@ -1,8 +1,9 @@
 package com.elastic.elasticsearch.config
 
-import com.elastic.elasticsearch.elastic.CustomElasticsearchRestTemplate
+import org.springframework.data.elasticsearch.core.CustomElasticsearchRestTemplate
 import com.elastic.elasticsearch.elastic.DomainThreadLocal
 import org.elasticsearch.client.RestHighLevelClient
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.elasticsearch.client.ClientConfiguration
@@ -12,7 +13,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations
 import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter
 
 @Configuration
-class RestClientConfig: AbstractElasticsearchConfiguration() {
+class RestClientConfig(@Value("\${elastic.index.create}") private val autoCreateIndexEnabled: Boolean): AbstractElasticsearchConfiguration() {
 
     @Bean
     override fun elasticsearchClient(): RestHighLevelClient {
@@ -27,7 +28,8 @@ class RestClientConfig: AbstractElasticsearchConfiguration() {
         val template = CustomElasticsearchRestTemplate(
             elasticsearchClient,
             elasticsearchConverter,
-            DomainThreadLocal()
+            DomainThreadLocal(),
+            autoCreateIndexEnabled
         )
         template.refreshPolicy = refreshPolicy()
         return template

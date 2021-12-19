@@ -8,6 +8,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder
 import org.elasticsearch.index.query.Operator
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
+import org.springframework.data.domain.Pageable
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
 import org.springframework.data.elasticsearch.core.SearchHit
@@ -24,11 +25,11 @@ class ProductService(private val productRepository: ProductRepository, private v
         productRepository.save(product)
     }
 
-    fun searchProductsByName(name: String): List<Product> {
-        return productRepository.findByName(name)
+    fun searchProductsByName(name: String, pageable: Pageable): List<Product> {
+        return productRepository.findByNameContaining(name, pageable)
     }
 
-    fun search(productSearchRequest: ProductSearchRequest): List<Product> {
+    fun search(productSearchRequest: ProductSearchRequest, pageable: Pageable): List<Product> {
         var queryBuilder: BoolQueryBuilder = QueryBuilders.boolQuery()
         if (productSearchRequest.quantity != null) {
             queryBuilder = queryBuilder.must(QueryBuilders.matchQuery("quantity", productSearchRequest.quantity))
@@ -36,10 +37,13 @@ class ProductService(private val productRepository: ProductRepository, private v
         if (productSearchRequest.categories.isNotEmpty()) {
             queryBuilder = queryBuilder.must(QueryBuilders.termsQuery("category", *productSearchRequest.categories.toTypedArray()))
         }
+        if (productSearchRequest.name != null) {
+            queryBuilder = queryBuilder.must(QueryBuilders.wildcardQuery("name", "*" + productSearchRequest.name + "*"))
+        }
         if (productSearchRequest.minPrice != null && productSearchRequest.maxPrice != null) {
             queryBuilder = queryBuilder.must(QueryBuilders.rangeQuery("price").from(productSearchRequest.minPrice).to(productSearchRequest.maxPrice))
         }
-        val query: Query = NativeSearchQueryBuilder().withQuery(queryBuilder).build()
+        val query: Query = NativeSearchQueryBuilder().withQuery(queryBuilder).withPageable(pageable).build()
         val results : SearchHits<Product> = elasticsearchRestTemplate.search(query, Product::class.java)
 
         return results.map { it.content }.toList()
