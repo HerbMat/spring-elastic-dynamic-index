@@ -26,5 +26,14 @@ data class Product(
     val description: String? = null,
 
     @Field(type = FieldType.Keyword, name = "manufacturer")
-    val manufacturer: String? = null
+    val manufacturer: String? = null,
+
+    @Field(type= FieldType.Object, name = "creator")
+    val creator: Creator = Creator("test", "test"),
+
+    @Field(type = FieldType.Nested, name = "secondary")
+    val secondary: Creator = Creator("secondary", "secondary"),
+
+    @Field(type = FieldType.Nested, name = "elements")
+    val elements: List<Element> = listOf(Element(), Element())
 )
